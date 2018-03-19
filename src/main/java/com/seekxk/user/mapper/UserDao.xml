@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.seekxk.user.dao.UserDao">
+    <!-- 查询单条记录 -->
+    <select id="selectByUserName" parameterType="String" resultType="com.seekxk.user.model.User">
+        SELECT * FROM user WHERE username = #{username}
+    </select>
+    <!-- 查询所有记录 -->
+    <select id="list"  resultType="Map">
+        SELECT * FROM user
+    </select>
+    <!--修改记录 -->
+    <update id="update" parameterType="com.seekxk.user.model.User">
+        update user
+        <set>
+            <if test=" username != null ">
+                username = #{username,jdbcType=VARCHAR},
+            </if>
+            <if test=" password != null ">
+                password = #{password,jdbcType=VARCHAR},
+            </if>
+            <if test=" email != null ">
+                email = #{email,jdbcType=VARCHAR}
+            </if>
+        </set>
+        where id = #{id,jdbcType=VARCHAR}
+    </update>
+    <!--添加记录 -->
+    <insert id="add" parameterType="com.seekxk.user.model.User">
+        <selectKey keyProperty="id" resultType="java.lang.String"
+                   order="BEFORE">
+            select replace(uuid(),'-','') from dual
+        </selectKey>
+        insert into user (id,username,password,email) values
+        (#{id},#{username},#{password},#{email})
+    </insert>
+    <delete id="delete">
+        delete from user where id=#{id}
+    </delete>
+
+    <!--下面开始是权限和角色相关
+    <select id="getRoleIds" resultMap="AdminRoleResultMap">
+        select * from user_role
+        where admin_id = #{adminId}
+    </select>
+    <select id="getRoles" resultMap="RoleResultMap" parameterType="java.util.Set">
+        select * from t_role where id in
+        <foreach collection="set" index="index" item="item" open="("
+                 separator="," close=")">
+            #{item.roleId}
+        </foreach>
+    </select>-->
+    <!-- 批量删除 使用map
+    <delete id="deleteRole" parameterType="map">
+        delete from user_role where admin_id = #{adminId} and role_id in
+        <foreach collection="deleteRoles" index="index" item="item"
+                 open="(" separator="," close=")">
+            #{item.roleId}
+        </foreach>
+    </delete>-->
+    <!-- 批量插入
+    <insert id="addRole">
+        insert into user_role (id,role_id,admin_id) values
+        <foreach collection="list" index="index" item="item"
+                 separator=",">
+            (#{item.id},#{item.roleId},#{item.adminId})
+        </foreach>
+    </insert> -->
+    <!-- 批量删除 使用list
+    <delete id="deleteRoles">
+        delete from user_role where admin_id = #{adminId} and role_id in
+        <foreach collection="deleteList" index="index" item="item"
+                 open="(" separator="," close=")">
+            #{item}
+        </foreach>
+    </delete>-->
+
+    <!-- 查询所有记录
+    <select id="list" parameterType="com.cn21.shop.vo.PageVo"
+            resultMap="BaseResultMap">
+        SELECT * FROM t_function
+        <if test=" page != null and size != null">
+            limit #{page},#{size}
+        </if>
+    </select>-->
+</mapper>
